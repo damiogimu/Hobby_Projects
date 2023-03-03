@@ -1,16 +1,5 @@
 #include "maze.h"
 
-#define PLAYER	'0'
-#define LAND	'1'
-#define WALL	'2'
-#define PASSED	'3'
-#define GOAL	'4'
-
-#define DIR_UP x-1
-#define DIR_DOWN x+1
-#define DIR_LEFT y-1
-#define DIR_RIGH y+1
-
 #define LAND_TO_WALL 80	// %
 #define PASS_TO_WALL 20 // %
 
@@ -24,6 +13,7 @@ typedef struct	s_data
 	int reach_f;
 }				t_data;
 
+/*
 void check_input(t_data *data)
 {
 	while (1)
@@ -36,7 +26,7 @@ void check_input(t_data *data)
 			break;
 	}
 }
-
+*/
 void disp_map(t_data *data)
 {
 	int i, j;

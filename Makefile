@@ -11,5 +11,11 @@ create: $(CREATE_OBJ)
 search: $(SEARCH_OBJ)
 	$(CC) -o $@ $^
 
+clean:
+	rm -f $(CREATE_OBJ) $(SEARCH_OBJ)
+
+fclean: clean
+	rm -f create search map.txt 
+
 %.o:%.c $(HEADER)
 	$(CC) $(CFLAGS) -c $<
