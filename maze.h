@@ -17,9 +17,6 @@
 #define GOAL	'4'
 #define NOW		'5'
 
-#define MAX_WIDTH 100
-#define MAX_HEIGHT 100
-
 #define WIDTH 40
 #define HEIGHT 40
 
