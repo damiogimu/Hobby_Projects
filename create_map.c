@@ -117,49 +117,7 @@ void flood_fill(int x, int y, t_data *data)
 	}
 	free(root);
 }
-/*
-void flood_fill(int x, int y, t_data *data)
-{
-	if (data->reach_f == 1)
-		return ;
-	if (data->tmp[x][y] == GOAL)
-	{
-		for (int k=0; k<data->height; k++)
-			strcpy(data->map[k], data->tmp[k]);
-		data->reach_f = 1;
-		return ;
-	}
-	int *root;
-	root = malloc(sizeof(int) * 4);
-	select_root(&root);
-	data->tmp[x][y] = PASSED;
-	if (PROCESS == 1)
-	{
-		usleep(F_ITV * 10e5);
-		system("clear");
-		disp_map(data, 1);
-	}
-	for (int i=0; i<4; i++)
-	{
-		switch(root[i])
-		{
-			case 0:
-				if (0 <= (x-1) && (data->tmp[x-1][y] == LAND || data->tmp[x-1][y] == GOAL))
-					flood_fill(x-1, y, data);
-			case 1:
-				if ((x+1) < data->height && (data->tmp[x+1][y] == LAND || data->tmp[x+1][y] == GOAL))
-					flood_fill(x+1, y, data);
-			case 2:
-				if (0 <= (y-1) && (data->tmp[x][y-1] == LAND || data->tmp[x][y-1] == GOAL))
-					flood_fill(x, y-1, data);
-			case 3:
-				if ((y+1) < data->width && (data->tmp[x][y+1] == LAND || data->tmp[x][y+1] == GOAL))
-					flood_fill(x, y+1, data);
-		}
-	}
-	free(root);
-}
-*/
+
 void fill_wall(t_data *data)
 {
 	int i, j;
