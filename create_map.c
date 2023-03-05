@@ -1,10 +1,9 @@
 #include "maze.h"
 
-#define LAND_TO_WALL 70	// %
-#define PASS_TO_WALL 10 // %
+#define LAND_TO_WALL 100
+#define PASS_TO_WALL 5
 
-#define PROCESS 0
-#define FRAME_ITV 0.01
+#define PROCESS 1
 
 typedef struct	s_data
 {
@@ -30,51 +29,28 @@ void check_input(t_data *data)
 	}
 }
 */
-void disp_tmp(t_data *data)
+void disp_map(t_data *data, int tmp_f)
 {
+	char **map;
 	int i, j;
+	map = data->map;
+	if (tmp_f == 1)
+		map = data->tmp;
 	i = 0;
 	while (i < data->height)
 	{
 		j = 0;
 		while (j < data->width)
 		{
-			if (data->tmp[i][j] == PLAYER)
+			if (map[i][j] == PLAYER)
 				printf("\x1b[34mP\x1b[0m ");
-			else if (data->tmp[i][j] == LAND)
+			else if (map[i][j] == LAND)
 				printf("  ");
-			else if (data->tmp[i][j] == WALL)
+			else if (map[i][j] == WALL)
 				(j == data->width-1) ? printf("#") : printf("# ");
-			else if (data->tmp[i][j] == GOAL)
+			else if (map[i][j] == GOAL)
 				printf("\x1b[31mX\x1b[0m ");
-			else if (data->tmp[i][j] == PASSED)
-				printf("* ");
-			else
-				printf("  ");
-			j++;
-		}
-		printf("\n");
-		i++;
-	}
-}
-void disp_map(t_data *data)
-{
-	int i, j;
-	i = 0;
-	while (i < data->height)
-	{
-		j = 0;
-		while (j < data->width)
-		{
-			if (data->map[i][j] == PLAYER)
-				printf("\x1b[34mP\x1b[0m ");
-			else if (data->map[i][j] == LAND)
-				printf("  ");
-			else if (data->map[i][j] == WALL)
-				(j == data->width-1) ? printf("#") : printf("# ");
-			else if (data->map[i][j] == GOAL)
-				printf("\x1b[31mX\x1b[0m ");
-			else if (data->tmp[i][j] == PASSED)
+			else if (map[i][j] == PASSED)
 				printf("* ");
 			else
 				printf("  ");
@@ -109,6 +85,41 @@ void select_root(int **root)
 
 void flood_fill(int x, int y, t_data *data)
 {
+	int *root;
+	if (data->reach_f == 1)
+		return ;
+	if (data->tmp[x][y] == GOAL)
+	{
+		for (int k=0; k<data->height; k++)
+			strcpy(data->map[k], data->tmp[k]);
+		data->reach_f = 1;
+		return ;
+	}
+	data->tmp[x][y] = PASSED;
+	if (PROCESS == 1)
+	{
+		usleep(F_ITV * 10e5);
+		system("clear");
+		disp_map(data, 1);
+	}
+	root = malloc(sizeof(int) * 4);
+	select_root(&root);
+	for (int i=0; i<4; i++)
+	{
+		if (root[i] == 0 && 0 <= (x-1) && (data->tmp[x-1][y] == LAND || data->tmp[x-1][y] == GOAL))
+			flood_fill(x-1, y, data);
+		if (root[i] == 1 && (x+1) < data->height && (data->tmp[x+1][y] == LAND || data->tmp[x+1][y] == GOAL))
+			flood_fill(x+1, y, data);
+		if (root[i] == 2 && 0 <= (y-1) && (data->tmp[x][y-1] == LAND || data->tmp[x][y-1] == GOAL))
+			flood_fill(x, y-1, data);
+		if (root[i] == 3 && (y+1) < data->width && (data->tmp[x][y+1] == LAND || data->tmp[x][y+1] == GOAL))
+			flood_fill(x, y+1, data);
+	}
+	free(root);
+}
+/*
+void flood_fill(int x, int y, t_data *data)
+{
 	if (data->reach_f == 1)
 		return ;
 	if (data->tmp[x][y] == GOAL)
@@ -124,9 +135,9 @@ void flood_fill(int x, int y, t_data *data)
 	data->tmp[x][y] = PASSED;
 	if (PROCESS == 1)
 	{
-		usleep(FRAME_ITV * 10e5);
+		usleep(F_ITV * 10e5);
 		system("clear");
-		disp_tmp(data);
+		disp_map(data, 1);
 	}
 	for (int i=0; i<4; i++)
 	{
@@ -148,7 +159,7 @@ void flood_fill(int x, int y, t_data *data)
 	}
 	free(root);
 }
-
+*/
 void fill_wall(t_data *data)
 {
 	int i, j;
@@ -166,9 +177,9 @@ void fill_wall(t_data *data)
 				data->map[i][j] = LAND;
 			if (PROCESS == 1)
 			{
-				usleep(FRAME_ITV * 10e5);
+				usleep(F_ITV * 10e5);
 				system("clear");
-				disp_map(data);
+				disp_map(data, 0);
 			}
 			j++;
 		}
@@ -240,7 +251,7 @@ int main(void)
 
 	fill_wall(&data);
 	system("clear");
-	disp_map(&data);
+	disp_map(&data, 0);
 
 	i = 0;
 	while (i < data.height)
