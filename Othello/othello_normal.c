@@ -1,14 +1,5 @@
 #include "othello.h"
 
-typedef struct	s_data
-{
-	char	my_c;
-	char	enemy;
-	char	**field;
-	int		x, y;
-	int		flag;
-}				t_data;
-
 void disp_field(t_data *);
 void flood_fill(int, int, t_data *, int);
 int	can_place(t_data *);
@@ -63,7 +54,7 @@ void flood_fill(int dx, int dy, t_data *data, int n)
 int can_place(t_data *data)
 {
 	if (data->field[data->x][data->y] != NONE)
-		return (0);
+		return (1);
 	for (int dx=-1; dx<=1; dx++)
 		for (int dy=-1; dy<=1; dy++)
 			if (data->field[data->x+dx][data->y+dy] == data->enemy)

@@ -1,19 +1,9 @@
 #include "othello.h"
 
-typedef struct	s_data
-{
-	char	my_c;
-	char	enemy;
-	char	**field;
-	char	**tmp;
-	int		x, y;
-	int		flag;
-}				t_data;
-
 void disp_field(t_data *, int);
 void flood_fill(int, int, t_data *, int);
 int	can_place(t_data *);
-int	is_finish(t_data *);
+int	check_field(t_data *);
 
 void disp_field(t_data *data, int tmp_f)
 {
@@ -36,6 +26,8 @@ void disp_field(t_data *data, int tmp_f)
 				printf("⚪️\t");
 			else if (map[i][j] == BLACK)
 				printf("⚫️\t");
+			else if (map[i][j] == CAN)
+				printf("\x1b[34mX\x1b[0m\t");
 		}
 		printf("\n\n\n");
 	}
@@ -43,7 +35,6 @@ void disp_field(t_data *data, int tmp_f)
 
 void flood_fill(int dx, int dy, t_data *data, int n)
 {
-	printf("dx = %d | dy = %d | n = %d\n", dx, dy, n);
 	if (data->flag == 1)
 		return ;
 	data->tmp[data->x+(dx*n)][data->y+(dy*n)] = data->my_c;
@@ -61,38 +52,36 @@ void flood_fill(int dx, int dy, t_data *data, int n)
 
 int can_place(t_data *data)
 {
+	if (data->field[data->x][data->y] == BLACK || data->field[data->x][data->y] == WHITE)
+		return (0);
 	for (int dx=-1; dx<=1; dx++)
 		for (int dy=-1; dy<=1; dy++)
-			if (data->field[data->x+dx][data->y+dy] == data->enemy)
+			if (0 <= data->x+dx && data->x+dx < HEIGHT && 0 <= data->y+dy && data->y+dy < WIDTH && data->field[data->x+dx][data->y+dy] == data->enemy)
 			{
 				data->flag = 0;
-				for (int k=0; k<HEIGHT; k++)
-					strcpy(data->tmp[k], data->field[k]);
 				flood_fill(dx, dy, data, 1);
 			}
 	if (data->tmp[data->x][data->y] == data->my_c)
-	{
-		for (int i=0; i<HEIGHT; i++)
-			strcpy(data->field[i], data->tmp[i]);
-		return (0);
-	}
-	printf("You can't put this place\n");
-	return (1);
+		return (1);
+	return (0);
 }
 
-int	is_finish(t_data *data)
+int	check_field(t_data *data)
 {
 	int i, j;
 	for (i=0; i<HEIGHT; i++)
 	{
 		for (j=0; j<WIDTH; j++)
 		{
-			if (data->field[i][j] == NONE)
-			{
-			}
+			data->x = i;
+			data->y = j;
+			if (data->tmp[i][j] == CAN)
+				data->tmp[i][j] = NONE;
+			if (can_place(data))
+				data->tmp[i][j] = CAN;
 		}
 	}
-	return (0);
+	return (1);
 }
 
 int main(void)
@@ -115,16 +104,24 @@ int main(void)
 	}
 	data.field[3][3] = data.field[4][4] = WHITE;
 	data.field[3][4] = data.field[4][3] = BLACK;
+	for (i=0; i<HEIGHT; i++)
+		strcpy(data.tmp[i], data.field[i]);
 
-//	while (is_finish(&data))
-	while (1)
+	while (check_field(&data))
 	{
+		for (i=0; i<HEIGHT; i++)
+			strcpy(data.tmp[i], data.field[i]);
 		disp_field(&data, 0);
 		printf("%s | select where to place piece: ", p_name[data.my_c-49]);
 		scanf("%d %d", &data.x, &data.y);
 
-		if (data.field[data.x][data.y] == NONE && can_place(&data))
+		if (!(can_place(&data)))
+		{
+			printf("You can't put this place\n");
 			continue;
+		}
+		for (i=0; i<HEIGHT; i++)
+			strcpy(data.field[i], data.tmp[i]);
 		data.my_c = (data.my_c==WHITE) ? BLACK : WHITE;	
 		data.enemy = (data.enemy==WHITE) ? BLACK : WHITE;	
 	}
