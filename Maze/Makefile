@@ -5,6 +5,8 @@ HEADER=maze.h
 CREATE_OBJ=create_map.o
 SEARCH_OBJ=search_map.o
 
+all:create search
+
 create: $(CREATE_OBJ)
 	$(CC) -o $@ $^
 

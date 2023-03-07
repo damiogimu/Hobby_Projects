@@ -17,9 +17,10 @@
 #define GOAL	'4'
 #define NOW		'5'
 
-#define WIDTH 40
-#define HEIGHT 40
+#define WIDTH 30
+#define HEIGHT 30
 
 #define OUT_F "map.txt"
+#define F_ITV 0.02
 
 #endif

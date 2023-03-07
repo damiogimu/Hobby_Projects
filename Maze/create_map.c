@@ -1,7 +1,7 @@
 #include "maze.h"
 
 #define LAND_TO_WALL 100
-#define PASS_TO_WALL 5
+#define PASS_TO_WALL 0
 
 #define PROCESS 1
 
@@ -29,6 +29,7 @@ void check_input(t_data *data)
 	}
 }
 */
+
 void disp_map(t_data *data, int tmp_f)
 {
 	char **map;
@@ -127,9 +128,9 @@ void fill_wall(t_data *data)
 		j = 1;
 		while (j < data->width-1)
 		{
-			if (data->map[i][j] == LAND && (rand()%100 >= (100-LAND_TO_WALL)))
+			if (data->map[i][j] == LAND && (rand()%100 > (99-LAND_TO_WALL)))
 				data->map[i][j] = WALL;
-			if (data->map[i][j] == PASSED && (rand()%100 >= (100-PASS_TO_WALL)))
+			if (data->map[i][j] == PASSED && (rand()%100 > (99-PASS_TO_WALL)))
 				data->map[i][j] = WALL;
 			if (data->map[i][j] == PASSED)
 				data->map[i][j] = LAND;

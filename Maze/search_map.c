@@ -1,7 +1,5 @@
 #include "maze.h" 
 
-#define F_ITV 0.1
-
 typedef struct	s_data
 {
 	char	**map;
@@ -66,7 +64,6 @@ void flood_fill(int x, int y, t_data *data)
 //
 	usleep(F_ITV * 10e5);
 	system("clear");
-	printf("----------------------\n");
 	disp_tmp(data);
 //
 	if (0 <= (x-1) && (data->tmp[x-1][y] == LAND || data->tmp[x-1][y] == GOAL))
