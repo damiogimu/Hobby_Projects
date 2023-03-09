@@ -1,6 +1,7 @@
 #include "othello.h"
 
 #define PROCESS 0
+#define GUIDE 1
 
 void disp_field(t_data *, int);
 void flood_fill(int, int, t_data *, int);
@@ -81,7 +82,8 @@ int	check_field(t_data *data)
 			data->y = j;
 			if (can_place(data))
 			{
-				data->field[i][j] = CAN;
+				if (GUIDE == 1)
+					data->field[i][j] = CAN;
 				if (PROCESS == 1)
 				{
 					usleep(0.7*10e5);
@@ -125,10 +127,10 @@ int judge_winner(t_data *data)
 
 int main(void)
 {
-	char p_name[2][6] = {"BLACK", "WHITE"};
+	char p_name[3][6] = {"BLACK", "WHITE"};
 	int i, j;
 	int p_c;
-	int is_finish;
+	int is_finish = 0;
 	t_data data;
 	
 	setvbuf(stdout, NULL, _IONBF, 0);
@@ -146,29 +148,31 @@ int main(void)
 	}
 	data.field[3][3] = data.field[4][4] = WHITE;
 	data.field[3][4] = data.field[4][3] = BLACK;
+
 	srand((unsigned int)time(NULL));
 	for (i=0; i<HEIGHT; i++)
 		strcpy(data.tmp[i], data.field[i]);
 	system("clear");
 	printf("select your number of color (0:BLACK  1:WHITE): ");
 	scanf("%d", &p_c);
-
 	if (p_c != 0 && p_c != 1)
 	{
 		printf("Invalid input\n");
 		return (0);
 	}
-	while (1)
+
+	while (is_finish < 2)
 	{
 		for (i=0; i<HEIGHT; i++)
 			strcpy(data.tmp[i], data.field[i]);
 		if (check_field(&data) == 0)
+		{
 			is_finish++;
+			continue;
+		}
 		else
 			is_finish = 0;
 		disp_field(&data, 0);
-		if (is_finish == 2)
-			return (judge_winner(&data));
 		for (i=0; i<HEIGHT; i++)
 			for (j=0; j<WIDTH; j++)
 				if (data.field[i][j] == CAN)
@@ -198,11 +202,11 @@ int main(void)
 		}
 		if (data.my_c != (p_c+49))
 		{
-			usleep(1.5*10e5);
+			usleep(3.5*10e5);
 			printf("%d ", data.x);
-			usleep(1.5*10e5);
-			printf("%d\n", data.y);
 			usleep(1.0*10e5);
+			printf("%d\n", data.y);
+			usleep(3.0*10e5);
 		}
 		for (i=0; i<HEIGHT; i++)
 			strcpy(data.field[i], data.tmp[i]);
@@ -210,7 +214,9 @@ int main(void)
 		data.enemy = (data.enemy==WHITE) ? BLACK : WHITE;
 		system("clear");
 	}
-	
+
+	judge_winner(&data);
+
 	for (i=0; i<HEIGHT; i++)
 		free(data.field[i]);
 	free(data.field);
