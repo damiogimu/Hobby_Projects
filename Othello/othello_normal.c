@@ -39,7 +39,7 @@ void flood_fill(int dx, int dy, t_data *data, int n)
 	if (data->flag == 1)
 		return ;
 	data->field[data->x+(dx*n)][data->y+(dy*n)] = data->my_c;
-	if (data->field[data->x+(dx*(n+1))][data->y+(dy*(n+1))] == data->my_c)
+	if (0 <= data->x+(dx*(n+1)) && data->x+(dx*(n+1)) < HEIGHT && 0 <= data->y+(dy*(n+1)) && data->y+(dy*(n+1)) < WIDTH && data->field[data->x+(dx*(n+1))][data->y+(dy*(n+1))] == data->my_c)
 	{
 		data->field[data->x][data->y] = data->my_c;
 		data->flag = 1;
@@ -47,7 +47,8 @@ void flood_fill(int dx, int dy, t_data *data, int n)
 	}
 	if (0 <= data->x+(dx*(n+1)) && data->x+(dx*(n+1)) < HEIGHT && 0 <= data->y+(dy*(n+1)) && data->y+(dy*(n+1)) < WIDTH && data->field[data->x+(dx*(n+1))][data->y+(dy*(n+1))] == data->enemy)
 		flood_fill(dx, dy, data, n+1);
-	data->field[data->x+(dx*n)][data->y+(dy*n)] = data->enemy;
+	if (data->flag == 0)
+		data->field[data->x+(dx*n)][data->y+(dy*n)] = data->enemy;
 	return ;
 }
 
@@ -57,7 +58,7 @@ int can_place(t_data *data)
 		return (1);
 	for (int dx=-1; dx<=1; dx++)
 		for (int dy=-1; dy<=1; dy++)
-			if (data->field[data->x+dx][data->y+dy] == data->enemy)
+			if (0 <= data->x+dx && data->x+dx < HEIGHT && 0 <= data->y+dy && data->y+dy < WIDTH && data->field[data->x+dx][data->y+dy] == data->enemy)
 			{
 				data->flag = 0;
 				flood_fill(dx, dy, data, 1);
@@ -85,7 +86,7 @@ int main(void)
 	}
 	data.field[3][3] = data.field[4][4] = WHITE;
 	data.field[3][4] = data.field[4][3] = BLACK;
-	
+
 	while (1)
 	{
 		disp_field(&data);
