@@ -1,12 +1,5 @@
 #include "maze.h" 
 
-typedef struct	s_data
-{
-	char	**map;
-	char	**tmp;
-	int		goal_f;
-}				t_data;
-
 void	all_free(char ***str);
 void	flood_fill(int x, int y, t_data *data);
 void	disp_map(t_data *data);
@@ -51,21 +44,24 @@ int	check_input(int *fd, int argc, char **argv)
 
 void flood_fill(int x, int y, t_data *data)
 {
-	if (data->goal_f == 1)
+	if (data->reach_f == 1)
 		return ;
 	if (data->tmp[x][y] == GOAL)
 	{
-		data->goal_f = 1;
+		data->reach_f = 1;
 		for (int k=0; k<HEIGHT; k++)
 			strcpy(data->map[k], data->tmp[k]);
 		return ;
 	}
 	data->tmp[x][y] = NOW;
-//
-	usleep(F_ITV * 10e5);
-	system("clear");
-	disp_tmp(data);
-//
+
+	if (PROCESS == 1)
+	{
+		usleep(F_ITV * 10e5);
+		disp_tmp(data);
+		printf("\x1b[%dA", HEIGHT);
+	}
+
 	if (0 <= (x-1) && (data->tmp[x-1][y] == LAND || data->tmp[x-1][y] == GOAL))
 	{
 		data->tmp[x][y] = 'u';
@@ -167,7 +163,7 @@ int main(int argc, char **argv)
 	int p_x, p_y;
 	int fd = -1;
 	t_data data;
-	data.goal_f = 0;
+	data.reach_f = 0;
 	data.map = malloc(sizeof(char *) * HEIGHT);
 	data.tmp = malloc(sizeof(char *) * HEIGHT);
 	i = 0;
@@ -187,6 +183,7 @@ int main(int argc, char **argv)
 		i++;
 	}
 
+	system("clear");
 	i = 0;
 	while (i < HEIGHT)
 	{
@@ -206,9 +203,8 @@ int main(int argc, char **argv)
 		i++;
 	}
 	data.map[p_x][p_y] = PLAYER;
-	system("clear");
 
-	if (data.goal_f == 0)
+	if (data.reach_f == 0)
 	{
 		disp_tmp(&data);
 		printf("Can't reach the GOAL\n");

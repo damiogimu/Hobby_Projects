@@ -1,19 +1,7 @@
 #include "maze.h"
 
 #define LAND_TO_WALL 100
-#define PASS_TO_WALL 0
-
-#define PROCESS 1
-
-typedef struct	s_data
-{
-	char **map;
-	char **tmp;
-	int width, height;
-	int p_x, p_y;
-	int g_x, g_y;
-	int reach_f;
-}				t_data;
+#define PASS_TO_WALL 5
 
 /*
 void check_input(t_data *data)
@@ -100,8 +88,8 @@ void flood_fill(int x, int y, t_data *data)
 	if (PROCESS == 1)
 	{
 		usleep(F_ITV * 10e5);
-		system("clear");
 		disp_map(data, 1);
+		printf("\x1b[%d)A", data->height);
 	}
 	root = malloc(sizeof(int) * 4);
 	select_root(&root);
@@ -137,8 +125,8 @@ void fill_wall(t_data *data)
 			if (PROCESS == 1)
 			{
 				usleep(F_ITV * 10e5);
-				system("clear");
 				disp_map(data, 0);
+				printf("\x1b[%d)A", data->height);
 			}
 			j++;
 		}
@@ -191,6 +179,7 @@ int main(void)
 	data.map[data.p_x][data.p_y] = PLAYER;
 	data.map[data.g_x][data.g_y] = GOAL;
 
+	system("clear");
 	i = 0;
 	while (i < data.height)
 	{
@@ -209,9 +198,9 @@ int main(void)
 	}
 
 	fill_wall(&data);
-	system("clear");
 	disp_map(&data, 0);
-
+	printf("\n");
+	
 	i = 0;
 	while (i < data.height)
 	{

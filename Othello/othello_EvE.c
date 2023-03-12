@@ -3,6 +3,10 @@
 #define PROCESS 0
 #define GUIDE 1
 
+#define WT1 0.15
+#define WT2 0.05
+#define WT3 0.1
+
 void disp_field(t_data *, int);
 void flood_fill(int, int, t_data *, int);
 int	can_place(t_data *);
@@ -14,7 +18,6 @@ void disp_field(t_data *data, int tmp_f)
 	char **map;
 	map = ((tmp_f==1) ? data->tmp : data->field);
 	printf("\n\t");
-
 	for (i=0;i<WIDTH;i++)
 		printf("%d\t", i);
 	printf("\n\n\n");
@@ -87,7 +90,6 @@ int	check_field(t_data *data)
 				if (PROCESS == 1)
 				{
 					usleep(0.7*10e5);
-					system("clear");
 					disp_field(data, 1);
 				}
 				for (int k=0;k<HEIGHT; k++)
@@ -114,13 +116,19 @@ int judge_winner(t_data *data)
 				b_num++;
 		}
 	disp_field(data, 0);
-	printf("BLACK : %d  |  WHITE : %d\n", b_num, w_num);
+	printf("\r");
+	for (i=0;i<60;i++)
+		printf(" ");
+	printf("\r");
+	printf("\rBLACK : %d  |  WHITE : %d\n", b_num, w_num);
+	printf("----------------------------------\n\t");
 	if (w_num > b_num)
-		printf("\n\nWINNER : WHITE\n");
+		printf("WINNER : WHITE\n");
 	else if (w_num < b_num)
-		printf("\n\nWINNER : BLACK\n");
+		printf("WINNER : BLACK\n");
 	else
-		printf("\n\nDRAW\n");
+		printf("DRAW\n");
+	printf("----------------------------------\n");
 
 	return (0);
 }
@@ -151,7 +159,6 @@ int main(void)
 	srand((unsigned int)time(NULL));
 	for (i=0; i<HEIGHT; i++)
 		strcpy(data.tmp[i], data.field[i]);
-	system("clear");
 
 	while (is_finish < 2)
 	{
@@ -171,6 +178,10 @@ int main(void)
 					data.field[i][j] = NONE;
 		for (i=0; i<HEIGHT; i++)
 			strcpy(data.tmp[i], data.field[i]);
+		printf("\r");
+		for (i=0;i<60;i++)
+			printf(" ");
+		printf("\r");
 		printf("%s | select where to place piece: ", p_name[data.my_c-49]);
 	
 		data.x = rand()%8;
@@ -182,17 +193,17 @@ int main(void)
 			continue;
 		}
 		
-		usleep(0.7*10e5);
+		usleep(WT1*10e5);
 		printf("%d ", data.x);
-		usleep(0.3*10e5);
+		usleep(WT2*10e5);
 		printf("%d\n", data.y);
-		usleep(0.5*10e5);
+		usleep(WT3*10e5);
+		printf("\x1b[29A"); // Escape_code : cursol 
 		
 		for (i=0; i<HEIGHT; i++)
 			strcpy(data.field[i], data.tmp[i]);
 		data.my_c = (data.my_c==WHITE) ? BLACK : WHITE;	
 		data.enemy = (data.enemy==WHITE) ? BLACK : WHITE;
-		system("clear");
 	}
 
 	judge_winner(&data);

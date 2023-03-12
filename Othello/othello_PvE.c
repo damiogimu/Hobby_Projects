@@ -56,6 +56,8 @@ void flood_fill(int dx, int dy, t_data *data, int n)
 
 int can_place(t_data *data)
 {
+	if (data->x < 0 || HEIGHT <= data->x || data->y < 0 || WIDTH <= data->y)
+		return (0);
 	if (data->field[data->x][data->y] == BLACK || data->field[data->x][data->y] == WHITE)
 		return (0);
 	for (int dx=-1; dx<=1; dx++)
@@ -131,6 +133,8 @@ int main(void)
 	int i, j;
 	int p_c;
 	int is_finish = 0;
+	int miss_c;
+	int scan_n;
 	t_data data;
 	
 	setvbuf(stdout, NULL, _IONBF, 0);
@@ -182,17 +186,20 @@ int main(void)
 		printf("%s | select where to place piece: ", p_name[data.my_c-49]);
 	
 		if ((p_c+49) == data.my_c)
-			scanf("%d %d", &data.x, &data.y);
+			scan_n = scanf("%d %d", &data.x, &data.y);
 		else
 		{
 			data.x = rand()%8;
 			data.y = rand()%8;
 		}
-
+		miss_c = 0;
 		while (!(can_place(&data)))
 		{
 			if ((p_c+49) == data.my_c)
-				scanf("%d %d", &data.x, &data.y);
+			{
+				scan_n = scanf("%d %d", &data.x, &data.y);
+				miss_c++;
+			}
 			else
 			{
 				data.x = rand()%8;
@@ -204,15 +211,17 @@ int main(void)
 		{
 			usleep(3.5*10e5);
 			printf("%d ", data.x);
-			usleep(1.0*10e5);
-			printf("%d\n", data.y);
-			usleep(3.0*10e5);
+			usleep(2.0*10e5);
+			printf("%d", data.y);
+			usleep(1.5*10e5);
+			printf("\n");
 		}
+		printf("\x1b[%dA", 29+miss_c);
+		printf("\x1b[%dD", scan_n);
 		for (i=0; i<HEIGHT; i++)
 			strcpy(data.field[i], data.tmp[i]);
 		data.my_c = (data.my_c==WHITE) ? BLACK : WHITE;	
 		data.enemy = (data.enemy==WHITE) ? BLACK : WHITE;
-		system("clear");
 	}
 
 	judge_winner(&data);
