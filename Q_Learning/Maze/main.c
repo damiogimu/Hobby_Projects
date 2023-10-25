@@ -1,13 +1,16 @@
 #include "my_header.h"
 
 char map[MAP_HEIGHT][MAP_WIDTH]={\
-	{"111111111"},\
-	{"1000001G1"},\
-	{"101110001"},\
-	{"101010111"},\
-	{"101010101"},\
-	{"1P0000001"},\
-	{"111111111"}};
+	{"1111111111"},\
+	{"1000001101"},\
+	{"1111101101"},\
+	{"1000101101"},\
+	{"1000000001"},\
+	{"1011101001"},\
+	{"101G101001"},\
+	{"1010111001"},\
+	{"1P10000001"},\
+	{"1111111111"}};
 
 void update_Qtable(double Qtable[][MAP_WIDTH], t_info *info)
 {
@@ -26,7 +29,7 @@ void update_Qtable(double Qtable[][MAP_WIDTH], t_info *info)
 void move(char map[][MAP_WIDTH], double Qtable[][MAP_WIDTH], t_info *info)
 {
 	double total;
-	double up, right, left, down;
+	double up,right,left,down;
 	double dir;
 
 	total = exp(Qtable[info->py-1][info->px]/T) \
@@ -103,8 +106,10 @@ int main(void)
 		else
 			move(map, Qtable, &info);
 		if (finish_f != 1)
+		{
 			printf("\x1b[%dF", (5*MAP_HEIGHT+2));
-		disp_phase(&info);
+			disp_phase(&info);
+		}
 		disp_map(map);
 		disp_Qtable(map, Qtable, &info);
 		usleep(DELAY);

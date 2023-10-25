@@ -13,11 +13,11 @@
 #define T		0.05
 #define Reward	1.0
 
-#define DELAY	0.1 * 1.0e6
-#define TRIAL	1000
+#define DELAY	0.0 * 1.0e6
+#define TRIAL	100
 
-#define MAP_HEIGHT	7
-#define MAP_WIDTH	9
+#define MAP_HEIGHT	10
+#define MAP_WIDTH	10
 
 #define PATH	'0'
 #define WALL	'1'

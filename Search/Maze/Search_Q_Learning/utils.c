@@ -1,6 +1,45 @@
 #include "my_header.h"
 
-int setup(char map[][MAP_WIDTH], double Qtable[][MAP_WIDTH], t_info *info)
+void initQueue(t_queue *queue)
+{
+	queue->head = 0;
+	queue->tail = 0;
+	queue->size = -1;
+}
+
+void enqueue(char map[][MAP_WIDTH], double Qtable[][MAP_WIDTH], t_queue *queue, t_data *data)
+{
+	if (queue->size == MAX_QUEUE_SIZE)
+	{
+		fprintf(stderr, "queue is full\n\n");
+		return ;
+	}
+	map[data->y][data->x] = PATH;
+	Qtable[data->y][data->x] = pow(gamma,data->distance) * Reward;
+	queue->list[queue->tail] = *data;
+	queue->tail = (queue->tail+1) % MAX_QUEUE_SIZE;
+	queue->size = queue->tail - queue->head;
+	if (queue->tail < queue->head)
+		queue->size = MAX_QUEUE_SIZE - (queue->head - queue->tail);
+}
+
+t_data *dequeue(t_queue *queue)
+{
+	t_data *val;
+	if (queue->size == 0)
+	{
+		fprintf(stderr, "queue is empty\n\n");
+		return (NULL);
+	}
+	val = &(queue->list[queue->head]);
+	queue->head = (queue->head+1) % MAX_QUEUE_SIZE;
+	queue->size = queue->tail - queue->head;
+	if (queue->tail < queue->head)
+		queue->size = MAX_QUEUE_SIZE - (queue->head - queue->tail);
+	return (val);
+}
+
+int setup(char map[][MAP_WIDTH], double Qtable[][MAP_WIDTH], t_info *info, t_queue *queue, t_data *data)
 {
 	srand((unsigned int)time(NULL));
 	if (setvbuf(stdout,NULL,_IONBF,0) != 0)	
@@ -18,7 +57,6 @@ int setup(char map[][MAP_WIDTH], double Qtable[][MAP_WIDTH], t_info *info)
 			{
 				info->gx = j;
 				info->gy = i;
-				Qtable[i][j] = Reward;
 			}
 			else if (map[i][j] == PLAYER)
 			{
@@ -37,7 +75,18 @@ int setup(char map[][MAP_WIDTH], double Qtable[][MAP_WIDTH], t_info *info)
 		fprintf(stderr, "\x1b[31mError : Incorrect Map\x1b[0m\n");
 		return (-1);
 	}
+	data->x = info->gx;
+	data->y = info->gy;
+	enqueue(map, Qtable, queue, data);
 	return (0);
+}
+
+void reset_map(char map[][MAP_WIDTH], t_info *info)
+{
+	map[info->gy][info->gx] = GOAL;
+	map[info->init_py][info->init_px] = PLAYER;
+	info->px = info->init_px;
+	info->py = info->init_py;
 }
 
 int is_finish(char map[][MAP_WIDTH], t_info *info)
@@ -47,17 +96,16 @@ int is_finish(char map[][MAP_WIDTH], t_info *info)
 	ssize_t r_size;
 	while (1)
 	{
-		printf("\n");
+		printf("\n\n");
 		printf("                               \r");
 		printf("finish? (yes or no) -> ");
 		r_size = read(STDIN_FILENO, buf, 4);
-		buf[r_size] = '\0';
 		for (i=0; i<5; i++)
 			if (buf[i] == '\n')
 				buf[i] = '\0';
 		if (strcmp(buf,"yes") == 0)
 			return (1);
-		printf("\x1b[2A");
+		printf("\x1b[3A");
 		if (strcmp(buf,"no") == 0)
 			return (0);
 	}
@@ -99,9 +147,11 @@ void make_optimal_path(char map[][MAP_WIDTH], double Qtable[][MAP_WIDTH], t_info
 	}
 }
 
+
 void disp_map(char map[][MAP_WIDTH])
 {
 	int i, j;
+	printf("\n");
 	for (i=0;i<2*MAP_WIDTH+3;i++)
 		printf("-");
 	printf("\n  ");
@@ -113,7 +163,9 @@ void disp_map(char map[][MAP_WIDTH])
 		printf("%d ", i+1);
 		for (j=0; j<MAP_WIDTH; j++)
 		{
-			if (map[i][j] == WALL)
+			if (map[i][j] == INIT)
+				printf("*");
+			else if (map[i][j] == WALL)
 				printf("#");
 			else if (map[i][j] == PATH)
 				printf("\x1b[33mo");
@@ -156,19 +208,16 @@ void disp_Qtable(char map[][MAP_WIDTH], double Qtable[][MAP_WIDTH], t_info *info
 	printf("\n");
 	for (i=0; i<8*MAP_WIDTH; i++)
 		printf("-");
-}
-
-void disp_phase(t_info *info)
-{
-	for (int i=0;i<2*MAP_WIDTH+3;i++)
-		printf("-");
 	printf("\n");
-	printf("phase : %8d\n", info->try_c);
+	printf("                               \r");
+	printf("phase : %8d  |\n", info->try_c);
+	printf("-------------------\n");
+	printf("\x1b[2A");
 }
 
-double max(double val1, double val2)
+double max(double a, double b)
 {
-	if (val1 <= val2)
-		return (val2);
-	return (val1);
+	if (a <= b)
+		return (b);
+	return (a);
 }
