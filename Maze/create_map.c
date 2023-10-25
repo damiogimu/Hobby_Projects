@@ -3,21 +3,6 @@
 #define LAND_TO_WALL 100
 #define PASS_TO_WALL 5
 
-/*
-void check_input(t_data *data)
-{
-	while (1)
-	{
-		scanf("%d %d", &data->height, &data->width);
-		if (data->height <= 2 || data->width <= 2 || \
-			   	MAX_HEIGHT < data->height || MAX_WIDTH < data->width)
-			fprintf(stderr, "Invalid val (range 4 ~ 100): ");
-		else
-			break;
-	}
-}
-*/
-
 void disp_map(t_data *data, int tmp_f)
 {
 	char **map;
@@ -26,17 +11,17 @@ void disp_map(t_data *data, int tmp_f)
 	if (tmp_f == 1)
 		map = data->tmp;
 	i = 0;
-	while (i < data->height)
+	while (i < HEIGHT)
 	{
 		j = 0;
-		while (j < data->width)
+		while (j < WIDTH)
 		{
 			if (map[i][j] == PLAYER)
 				printf("\x1b[34mP\x1b[0m ");
 			else if (map[i][j] == LAND)
 				printf("  ");
 			else if (map[i][j] == WALL)
-				(j == data->width-1) ? printf("#") : printf("# ");
+				(j == WIDTH-1) ? printf("#") : printf("# ");
 			else if (map[i][j] == GOAL)
 				printf("\x1b[31mX\x1b[0m ");
 			else if (map[i][j] == PASSED)
@@ -79,7 +64,7 @@ void flood_fill(int x, int y, t_data *data)
 		return ;
 	if (data->tmp[x][y] == GOAL)
 	{
-		for (int k=0; k<data->height; k++)
+		for (int k=0; k<HEIGHT; k++)
 			strcpy(data->map[k], data->tmp[k]);
 		data->reach_f = 1;
 		return ;
@@ -87,9 +72,9 @@ void flood_fill(int x, int y, t_data *data)
 	data->tmp[x][y] = PASSED;
 	if (PROCESS == 1)
 	{
-		usleep(F_ITV * 10e5);
+		usleep(F_ITV * 10e4);
 		disp_map(data, 1);
-		printf("\x1b[%d)A", data->height);
+		printf("\x1b[%d)A", HEIGHT);
 	}
 	root = malloc(sizeof(int) * 4);
 	select_root(&root);
@@ -97,11 +82,11 @@ void flood_fill(int x, int y, t_data *data)
 	{
 		if (root[i] == 0 && 0 <= (x-1) && (data->tmp[x-1][y] == LAND || data->tmp[x-1][y] == GOAL))
 			flood_fill(x-1, y, data);
-		if (root[i] == 1 && (x+1) < data->height && (data->tmp[x+1][y] == LAND || data->tmp[x+1][y] == GOAL))
+		if (root[i] == 1 && (x+1) < HEIGHT && (data->tmp[x+1][y] == LAND || data->tmp[x+1][y] == GOAL))
 			flood_fill(x+1, y, data);
 		if (root[i] == 2 && 0 <= (y-1) && (data->tmp[x][y-1] == LAND || data->tmp[x][y-1] == GOAL))
 			flood_fill(x, y-1, data);
-		if (root[i] == 3 && (y+1) < data->width && (data->tmp[x][y+1] == LAND || data->tmp[x][y+1] == GOAL))
+		if (root[i] == 3 && (y+1) < WIDTH && (data->tmp[x][y+1] == LAND || data->tmp[x][y+1] == GOAL))
 			flood_fill(x, y+1, data);
 	}
 	free(root);
@@ -111,10 +96,10 @@ void fill_wall(t_data *data)
 {
 	int i, j;
 	i = 1;
-	while (i < data->height-1)
+	while (i < HEIGHT-1)
 	{
 		j = 1;
-		while (j < data->width-1)
+		while (j < WIDTH-1)
 		{
 			if (data->map[i][j] == LAND && (rand()%100 > (99-LAND_TO_WALL)))
 				data->map[i][j] = WALL;
@@ -126,7 +111,7 @@ void fill_wall(t_data *data)
 			{
 				usleep(F_ITV * 10e5);
 				disp_map(data, 0);
-				printf("\x1b[%d)A", data->height);
+				printf("\x1b[%d)A", HEIGHT);
 			}
 			j++;
 		}
@@ -151,26 +136,22 @@ int main(void)
 	data.p_x = data.p_y = data.g_x = data.g_y = 0;
 	data.reach_f = 0;
 
-//	check_input(&data);
-	data.height = HEIGHT;
-	data.width = WIDTH;
-
 	while (data.p_x == data.g_x && data.p_y == data.g_y)
 	{
-		data.p_x = rand() % (data.width-2) + 1;
-		data.p_y = rand() % (data.height-2) + 1;
-		data.g_x = rand() % (data.width-2) + 1;
-		data.g_y = rand() % (data.height-2) + 1;
+		data.p_x = rand() % (WIDTH-2) + 1;
+		data.p_y = rand() % (HEIGHT-2) + 1;
+		data.g_x = rand() % (WIDTH-2) + 1;
+		data.g_y = rand() % (HEIGHT-2) + 1;
 	}
-	data.map = malloc(sizeof(char *) * data.height);
-	data.tmp = malloc(sizeof(char *) * data.height);
-	for (i=0; i<data.height; i++)
+	data.map = malloc(sizeof(char *) * HEIGHT);
+	data.tmp = malloc(sizeof(char *) * HEIGHT);
+	for (i=0; i<HEIGHT; i++)
 	{
-		data.map[i] = malloc(sizeof(char) * (data.width+1));
-		data.tmp[i] = malloc(sizeof(char) * (data.width+1));
-		for(j=0; j<data.width; j++)
+		data.map[i] = malloc(sizeof(char) * (WIDTH+1));
+		data.tmp[i] = malloc(sizeof(char) * (WIDTH+1));
+		for(j=0; j<WIDTH; j++)
 		{
-			if (1 <= i && i < (data.height-1) && 1 <= j && j < (data.width-1))
+			if (1 <= i && i < (HEIGHT-1) && 1 <= j && j < (WIDTH-1))
 				data.map[i][j] = LAND;
 			else
 				data.map[i][j] = WALL;
@@ -181,14 +162,14 @@ int main(void)
 
 	system("clear");
 	i = 0;
-	while (i < data.height)
+	while (i < HEIGHT)
 	{
 		j = 0;
-		while (j < data.width)
+		while (j < WIDTH)
 		{
 			if (data.map[i][j] == PLAYER)
 			{
-				for (int k=0; k<data.height; k++)
+				for (int k=0; k<HEIGHT; k++)
 					strcpy(data.tmp[k], data.map[k]);
 				flood_fill(i, j, &data);
 			}
@@ -202,14 +183,14 @@ int main(void)
 	printf("\n");
 	
 	i = 0;
-	while (i < data.height)
+	while (i < HEIGHT)
 	{
 		fprintf(fd, "%s\n", data.map[i]);
 		i++;
 	}
 
 	i = 0;
-	while(i < data.height)
+	while(i < HEIGHT)
 	{
 		free(data.map[i]);
 		i++;

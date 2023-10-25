@@ -3,7 +3,7 @@
 #define PROCESS 0
 #define GUIDE 1
 
-#define WT1 0.15
+#define WT1 0.55
 #define WT2 0.05
 #define WT3 0.1
 

@@ -27,8 +27,8 @@ typedef struct	s_data
 #define GOAL	'4'
 #define NOW		'5'
 
-#define WIDTH 30
-#define HEIGHT 30
+#define WIDTH 10
+#define HEIGHT 10
 
 #define PROCESS 1
 #define OUT_F "map.txt"

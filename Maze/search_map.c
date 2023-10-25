@@ -107,13 +107,13 @@ void disp_tmp(t_data *data)
 			else if (data->tmp[i][j] == GOAL)
 				printf("\x1b[31mX\x1b[0m ");
 			else if (data->tmp[i][j] == 'u')
-				printf("\x1b[33m▲ \x1b[0m");
+				printf("\x1b[33m▲\x1b[0m ");
 			else if (data->tmp[i][j] == 'd')
-				printf("\x1b[33m▼ \x1b[0m");
+				printf("\x1b[33m▼\x1b[0m ");
 			else if (data->tmp[i][j] == 'l')
-				printf("\x1b[33m◀︎ \x1b[0m");
+				printf("\x1b[33m◀︎\x1b[0m ");
 			else if (data->tmp[i][j] == 'r')
-				printf("\x1b[33m▶︎ \x1b[0m");
+				printf("\x1b[33m▶︎\x1b[0m ");
 			else if (data->tmp[i][j] == LAND || data->tmp[i][j] == PASSED)
 				printf("  ");
 			j++;
